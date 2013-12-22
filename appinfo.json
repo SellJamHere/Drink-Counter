@@ -1,0 +1,17 @@
+{
+  "uuid": "666a1898-fac4-42e0-8ad3-058a7964ded6",
+  "shortName": "Drink Counter",
+  "longName": "Drink Counter",
+  "companyName": "SellJamHere",
+  "versionCode": 1,
+  "versionLabel": "1.0.0",
+  "watchapp": {
+    "watchface": false
+  },
+  "appKeys": {
+    "dummy": 0
+  },
+  "resources": {
+    "media": []
+  }
+}
