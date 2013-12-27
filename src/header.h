@@ -25,5 +25,7 @@
 #define START_TIME_KEY 1
 //Persistance defaults
 #define DRINK_COUNT_DEFAULT 0
+ //Number of DisplayLayers
+#define LOWER_LAYER_COUNT 2
 
 #endif

@@ -5,11 +5,13 @@
 
 typedef struct
 {
-  Layer *displayLayer;
-  TextLayer *staticTextLayer;
-  TextLayer *dynamicTextLayer;
+	const char *staticStr;
+	char dynamicStr[BUFFER_LENGTH];
+	Layer *displayLayer;
+	TextLayer *staticTextLayer;
+	TextLayer *dynamicTextLayer;
 } DisplayLayer;
 
-DisplayLayer display_layer_create(GRect frame, const char *staticStr, char dynamicStr[]);
+DisplayLayer* display_layer_create(GRect frame, const char *staticStr);
 
 #endif
