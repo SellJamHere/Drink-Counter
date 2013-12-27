@@ -1,0 +1,31 @@
+
+#include "display_layer.h"
+
+DisplayLayer display_layer_create(GRect frame, const char *staticStr, char dynamicStr[]);
+static void display_layer_set(DisplayLayer displayLayer, const char *staticStr, char dynamicStr[]);
+
+DisplayLayer display_layer_create(GRect frame, const char *staticStr, char dynamicStr[])
+{
+	DisplayLayer displayLayer;
+	displayLayer.displayLayer = layer_create(frame);
+	displayLayer.staticTextLayer = text_layer_create(GRect(0, 0, frame.size.w, TEXT_HEIGHT));
+	GRect topBounds = layer_get_bounds(text_layer_get_layer(displayLayer.staticTextLayer));
+  	displayLayer.dynamicTextLayer = text_layer_create(GRect(0, 1 + (topBounds.size.h + topBounds.origin.y), frame.size.w, TEXT_HEIGHT));
+
+  	display_layer_set(displayLayer, staticStr, dynamicStr);
+
+	return displayLayer;
+}
+
+static void display_layer_set(DisplayLayer displayLayer, const char *staticStr, char dynamicStr[])
+{
+  //init static text layer
+  text_layer_set_text(displayLayer.staticTextLayer, staticStr);
+  text_layer_set_font(displayLayer.staticTextLayer, fonts_get_system_font(FONT_KEY_BITHAM_30_BLACK));
+  layer_add_child(displayLayer.displayLayer, text_layer_get_layer(displayLayer.staticTextLayer));
+  //init dynamic text layer
+  text_layer_set_text(displayLayer.dynamicTextLayer, dynamicStr);
+  text_layer_set_font(displayLayer.dynamicTextLayer, fonts_get_system_font(FONT_KEY_BITHAM_30_BLACK));
+  text_layer_set_text_alignment(displayLayer.dynamicTextLayer, GTextAlignmentRight);
+  layer_add_child(displayLayer.displayLayer, text_layer_get_layer(displayLayer.dynamicTextLayer));
+}
