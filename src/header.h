@@ -1,12 +1,15 @@
+/************************************************************
+ * AUTHOR 		: James Heller 
+ * LICENSE 		: MIT
+ * DATE CREATED : 2013-12-21
+ ************************************************************/
+
 #ifndef HEADER_H
 #define HEADER_H
 
 #include <pebble.h>
 
 /************************************************************
- *  DEFINED CONSTANTS
- *  *****************
- *
  *  BUFFER_LENGTH        - c string array size
  *  HOUR_CONVERT     	 - conversion factor for drinks/hr
  *	TEXT_HEIGHT  		 - height for TextLayers

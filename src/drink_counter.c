@@ -22,6 +22,19 @@ static uint startTime;
 static char firstDrinkStr[BUFFER_LENGTH];
 static char lastDrinkStr[BUFFER_LENGTH];
 
+//Pebble Foundation functions
+static void init(void);
+static void deinit(void);
+static void window_load(Window *window);
+static void window_unload(Window *window);
+//Click handlers
+static void click_config_provider(void *context);
+static void up_single_click_handler(ClickRecognizerRef recognizer, void *context);
+static void up_double_click_handler(ClickRecognizerRef recognizer, void *context);
+static void select_double_click_handler(ClickRecognizerRef recognizer, void *context);
+static void down_click_handler(ClickRecognizerRef recognizer, void *context);
+
+static void drink_layer_load(Layer *parent);
 static void floatToString(char* buffer, int bufferSize, double number);
 static void setDrinkCountStr(int count);
 static void setDrinkCountTextLayerText(int count);
@@ -34,80 +47,32 @@ static void setLastDrinkTextLayerText();
 static void updateLastDrinkTextLayerText();
 static void clearLastDrinkTextLayerText();
 static void resetDrinkCount();
-static void drink_layer_load(Layer *parent);
 static void window_layer_update_callback(Layer *layer, GContext *ctx);
 
+/********************************************************** 
+* 
+* DRINK COUNTER
+* 
+*_________________________________________________________ 
+* This Pebble watchapp allows a user to monitor drink 
+* consumption. The total number of drinks, time of the 
+* first drink, time of the last drink and drinks per hour
+* are recorded.Drink count is always displayed on the top 
+* half of the screen, while first, last and drinks per
+* hour can be cycled through on the bottom half.
+*_________________________________________________________ 
+* Input is given through button clicks.
+* UP single click     - increment drink count
+* UP double click     - decrement drink count
+* SELECT double click - reset drink counter
+* DOWN single click   - change lower display
+***********************************************************/ 
 
-static void select_double_click_handler(ClickRecognizerRef recognizer, void *context) 
+int main(void) 
 {
-  resetDrinkCount();
-}
-
-static void up_single_click_handler(ClickRecognizerRef recognizer, void *context) 
-{
-  if(drinkCount == 0)
-  {
-    setFirstDrinkTextLayerText();
-  }
-  drinkCount++;
-  setDrinkCountTextLayerText(drinkCount);
-  setDrinksPerHourTextLayerText();
-  setLastDrinkTextLayerText();
-}
-
-static void up_double_click_handler(ClickRecognizerRef recognizer, void *context)
-{
-  if(drinkCount - 1 == 0)
-  {
-    resetDrinkCount();
-  }
-  else if(drinkCount > 0)
-  {
-    drinkCount--;
-    setDrinkCountTextLayerText(drinkCount);
-    setDrinksPerHourTextLayerText();
-  }
-}
-
-static void down_click_handler(ClickRecognizerRef recognizer, void *context) 
-{
-  DisplayLayer *previousDisplayLayer = lowerLayers[layerIndex];
-
-  (layerIndex == LOWER_LAYER_COUNT - 1) ? layerIndex = 0 : layerIndex++;
-  DisplayLayer *currentDisplayLayer = lowerLayers[layerIndex];
-
-  layer_remove_from_parent(previousDisplayLayer->displayLayer);
-  layer_add_child(window_get_root_layer(window), currentDisplayLayer->displayLayer);
-     
-}
-
-static void click_config_provider(void *context) 
-{
-  window_multi_click_subscribe(BUTTON_ID_SELECT, 2, 0, 200, false, select_double_click_handler);
-  window_single_click_subscribe(BUTTON_ID_UP, up_single_click_handler);
-  window_multi_click_subscribe(BUTTON_ID_UP, 2, 0, 200, false, up_double_click_handler);
-  window_single_click_subscribe(BUTTON_ID_DOWN, down_click_handler);
-}
-
-static void window_load(Window *window) 
-{
-  Layer *window_layer = window_get_root_layer(window);
-
-  layer_set_update_proc(window_layer, window_layer_update_callback);
-
-  drink_layer_load(window_layer);
-
-  lowerLayers[0] = drinksPerHourDisplayLayer;
-  lowerLayers[1] = firstDrinkDisplayLayer;
-  lowerLayers[2] = lastDrinkDisplayLater;
-}
-
-static void window_unload(Window *window) 
-{
-  display_layer_destroy(drinkCountDisplayLayer);
-  display_layer_destroy(drinksPerHourDisplayLayer);
-  display_layer_destroy(firstDrinkDisplayLayer);
-  display_layer_destroy(lastDrinkDisplayLater);
+  init();
+  app_event_loop();
+  deinit();
 }
 
 static void init(void) 
@@ -121,9 +86,8 @@ static void init(void)
   const bool animated = true;
 
   //initialize from persistant storage, if values exist
-  // APP_LOG(APP_LOG_LEVEL_DEBUG, "drinkCount exists?: %d,\tstartTime exists?: %d", persist_exists(DRINK_COUNT_KEY), persist_exists(START_TIME_KEY));
   drinkCount = persist_exists(DRINK_COUNT_KEY) ? persist_read_int(DRINK_COUNT_KEY) : DRINK_COUNT_DEFAULT;
-  startTime = persist_exists(START_TIME_KEY) ? (uint)persist_read_int(START_TIME_KEY) : (uint)time(NULL);
+  startTime = persist_exists(START_TIME_KEY) ? (uint)persist_read_int(START_TIME_KEY) : 0;
   if(drinkCount != 0)
   {
     if(persist_exists(FIRST_DRINK_KEY))
@@ -165,11 +129,101 @@ static void deinit(void)
   window_destroy(window);
 }
 
-int main(void) 
+static void window_load(Window *window) 
 {
-  init();
-  app_event_loop();
-  deinit();
+  Layer *window_layer = window_get_root_layer(window);
+
+  layer_set_update_proc(window_layer, window_layer_update_callback);
+
+  drink_layer_load(window_layer);
+
+  lowerLayers[0] = drinksPerHourDisplayLayer;
+  lowerLayers[1] = firstDrinkDisplayLayer;
+  lowerLayers[2] = lastDrinkDisplayLater;
+}
+
+static void window_unload(Window *window) 
+{
+  display_layer_destroy(drinkCountDisplayLayer);
+  display_layer_destroy(drinksPerHourDisplayLayer);
+  display_layer_destroy(firstDrinkDisplayLayer);
+  display_layer_destroy(lastDrinkDisplayLater);
+}
+
+static void click_config_provider(void *context) 
+{
+  window_multi_click_subscribe(BUTTON_ID_SELECT, 2, 0, 200, false, select_double_click_handler);
+  window_single_click_subscribe(BUTTON_ID_UP, up_single_click_handler);
+  window_multi_click_subscribe(BUTTON_ID_UP, 2, 0, 200, false, up_double_click_handler);
+  window_single_click_subscribe(BUTTON_ID_DOWN, down_click_handler);
+}
+
+static void up_single_click_handler(ClickRecognizerRef recognizer, void *context) 
+{
+  if(drinkCount == 0)
+  {
+    startTime = (uint)time(NULL);
+    setFirstDrinkTextLayerText();
+  }
+  drinkCount++;
+  setDrinkCountTextLayerText(drinkCount);
+  setDrinksPerHourTextLayerText();
+  setLastDrinkTextLayerText();
+}
+
+static void up_double_click_handler(ClickRecognizerRef recognizer, void *context)
+{
+  if(drinkCount - 1 == 0)
+  {
+    resetDrinkCount();
+  }
+  else if(drinkCount > 0)
+  {
+    drinkCount--;
+    setDrinkCountTextLayerText(drinkCount);
+    setDrinksPerHourTextLayerText();
+  }
+}
+
+static void select_double_click_handler(ClickRecognizerRef recognizer, void *context) 
+{
+  resetDrinkCount();
+}
+
+static void down_click_handler(ClickRecognizerRef recognizer, void *context) 
+{
+  DisplayLayer *previousDisplayLayer = lowerLayers[layerIndex];
+
+  (layerIndex == LOWER_LAYER_COUNT - 1) ? layerIndex = 0 : layerIndex++;
+  DisplayLayer *currentDisplayLayer = lowerLayers[layerIndex];
+
+  layer_remove_from_parent(previousDisplayLayer->displayLayer);
+  layer_add_child(window_get_root_layer(window), currentDisplayLayer->displayLayer);
+     
+}
+
+
+
+
+static void drink_layer_load(Layer *parent)
+{
+  GRect bounds = layer_get_bounds(parent);
+  
+  drinkCountDisplayLayer = display_layer_create(bounds, DRINK_NUM);
+  setDrinkCountTextLayerText(drinkCount);
+
+  GRect lowerLayerBounds = GRect(0, 1 + (bounds.size.h/2), bounds.size.w, bounds.size.h/2 - 1);
+  drinksPerHourDisplayLayer = display_layer_create(lowerLayerBounds, DRINK_PER);
+  setDrinksPerHourTextLayerText();
+
+  firstDrinkDisplayLayer = display_layer_create(lowerLayerBounds, FIRST);
+  updateFirstDrinkTextLayerText();
+
+  lastDrinkDisplayLater = display_layer_create(lowerLayerBounds, LAST);
+  setLastDrinkTextLayerText();
+
+  layer_add_child(parent, drinkCountDisplayLayer->displayLayer);
+  layer_add_child(parent, drinksPerHourDisplayLayer->displayLayer);
 }
 
 static void floatToString(char* buffer, int bufferSize, double number)
@@ -278,27 +332,6 @@ static void resetDrinkCount()
   persist_delete(START_TIME_KEY);
   persist_delete(FIRST_DRINK_KEY);
   persist_delete(LAST_DRINK_KEY);
-}
-
-static void drink_layer_load(Layer *parent)
-{
-  GRect bounds = layer_get_bounds(parent);
-  
-  drinkCountDisplayLayer = display_layer_create(bounds, DRINK_NUM);
-  setDrinkCountTextLayerText(drinkCount);
-
-  GRect lowerLayerBounds = GRect(0, 1 + (bounds.size.h/2), bounds.size.w, bounds.size.h/2 - 1);
-  drinksPerHourDisplayLayer = display_layer_create(lowerLayerBounds, DRINK_PER);
-  setDrinksPerHourTextLayerText();
-
-  firstDrinkDisplayLayer = display_layer_create(lowerLayerBounds, FIRST);
-  updateFirstDrinkTextLayerText();
-
-  lastDrinkDisplayLater = display_layer_create(lowerLayerBounds, LAST);
-  setLastDrinkTextLayerText();
-
-  layer_add_child(parent, drinkCountDisplayLayer->displayLayer);
-  layer_add_child(parent, drinksPerHourDisplayLayer->displayLayer);
 }
 
 static void window_layer_update_callback(Layer *layer, GContext *ctx)
