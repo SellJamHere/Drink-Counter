@@ -1,6 +1,25 @@
 #include "header.h"
 #include "display_layer.h"
 
+/********************************************************** 
+* 
+* DRINK COUNTER
+* 
+*_________________________________________________________ 
+* This Pebble watchapp allows a user to monitor drink 
+* consumption. The total number of drinks, time of the 
+* first drink, time of the last drink and drinks per hour
+* are recorded.Drink count is always displayed on the top 
+* half of the screen, while first, last and drinks per
+* hour can be cycled through on the bottom half.
+*_________________________________________________________ 
+* Input is given through button clicks.
+* UP single click     - increment drink count
+* UP double click     - decrement drink count
+* SELECT double click - reset drink counter
+* DOWN single click   - change lower display
+***********************************************************/ 
+
 static Window *window;
 
 //Layout DisplayLayers
@@ -48,25 +67,6 @@ static void updateLastDrinkTextLayerText();
 static void clearLastDrinkTextLayerText();
 static void resetDrinkCount();
 static void window_layer_update_callback(Layer *layer, GContext *ctx);
-
-/********************************************************** 
-* 
-* DRINK COUNTER
-* 
-*_________________________________________________________ 
-* This Pebble watchapp allows a user to monitor drink 
-* consumption. The total number of drinks, time of the 
-* first drink, time of the last drink and drinks per hour
-* are recorded.Drink count is always displayed on the top 
-* half of the screen, while first, last and drinks per
-* hour can be cycled through on the bottom half.
-*_________________________________________________________ 
-* Input is given through button clicks.
-* UP single click     - increment drink count
-* UP double click     - decrement drink count
-* SELECT double click - reset drink counter
-* DOWN single click   - change lower display
-***********************************************************/ 
 
 int main(void) 
 {
