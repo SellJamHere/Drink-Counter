@@ -30,3 +30,11 @@ static void display_layer_set(DisplayLayer *displayLayer)
 	text_layer_set_text_alignment(displayLayer->dynamicTextLayer, GTextAlignmentRight);
 	layer_add_child(displayLayer->displayLayer, text_layer_get_layer(displayLayer->dynamicTextLayer));
 }
+
+void display_layer_destroy(DisplayLayer *displayLayer)
+{
+	text_layer_destroy(displayLayer->staticTextLayer);
+	text_layer_destroy(displayLayer->dynamicTextLayer);
+
+	layer_destroy(displayLayer->displayLayer);
+}

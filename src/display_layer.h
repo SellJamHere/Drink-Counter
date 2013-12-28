@@ -13,5 +13,6 @@ typedef struct
 } DisplayLayer;
 
 DisplayLayer* display_layer_create(GRect frame, const char *staticStr);
+void display_layer_destroy(DisplayLayer *displayLayer);
 
 #endif

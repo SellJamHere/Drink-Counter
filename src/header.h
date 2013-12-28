@@ -23,9 +23,11 @@
 //Persistance keys
 #define DRINK_COUNT_KEY 0
 #define START_TIME_KEY 1
+#define FIRST_DRINK_KEY 2
+#define LAST_DRINK_KEY 3
 //Persistance defaults
 #define DRINK_COUNT_DEFAULT 0
  //Number of DisplayLayers
-#define LOWER_LAYER_COUNT 2
+#define LOWER_LAYER_COUNT 3
 
 #endif
