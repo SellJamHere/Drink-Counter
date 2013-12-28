@@ -7,15 +7,20 @@
  *  DEFINED CONSTANTS
  *  *****************
  *
- *  BUFFER_LENGTH 16     - c string array size
- *  HOUR_CONVERT 3600	 - conversion factor for drinks/hr
- *	TEXT_HEIGHT 30 		 - height for TextLayers
+ *  BUFFER_LENGTH        - c string array size
+ *  HOUR_CONVERT     	 - conversion factor for drinks/hr
+ *	TEXT_HEIGHT  		 - height for TextLayers
  *
- *  DRINK_COUNT_KEY 0    - Persistance Key for drinkCount
- *  START_TIME_KEY 1     - Persistance Key for startTime
+ *  DRINK_COUNT_KEY      - Persistance Key for drinkCount
+ *  START_TIME_KEY       - Persistance Key for startTime
+ *	FIRST_DRINK_KEY 	 - Persistance Key for firstDrink
+ *	LAST_DRINK_KEY  	 - Persistance Key for LastDrink
  *
  *  DRINK_COUNT_DEFAULT  - Default value for drinkCount, 
  *                         if no value has been stored
+ *
+ *	LOWER_LAYER_COUNT	 - Number of lower layers that can
+ *						   be displayed.
  ************************************************************/
 #define BUFFER_LENGTH 16
 #define HOUR_CONVERT 3600

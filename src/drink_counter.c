@@ -3,8 +3,6 @@
 
 static Window *window;
 
-typedef enum {DRINK_PER_HOUR, FIRST_DRINK, LAST_DRINK} LowerLayer;
-
 //Layout DisplayLayers
 static DisplayLayer *drinkCountDisplayLayer;
 static DisplayLayer *drinksPerHourDisplayLayer;
@@ -12,7 +10,7 @@ static DisplayLayer *firstDrinkDisplayLayer;
 static DisplayLayer *lastDrinkDisplayLater;
 
 static DisplayLayer* lowerLayers[LOWER_LAYER_COUNT];
-static LowerLayer layerIndex = DRINK_PER_HOUR;
+static int layerIndex = 0;
 
 static const char *DRINK_NUM = "Drink #:";
 static const char *DRINK_PER = "Drink/hr:";
@@ -149,8 +147,8 @@ static void deinit(void)
   {
     //save to persistant storage
     // APP_LOG(APP_LOG_LEVEL_DEBUG, "drinkCount: %d,\tstartTime: %d", drinkCount, startTime);
-    int countStatus = persist_write_int(DRINK_COUNT_KEY, drinkCount);
-    int startStatus = persist_write_int(START_TIME_KEY, startTime);
+    persist_write_int(DRINK_COUNT_KEY, drinkCount);
+    persist_write_int(START_TIME_KEY, startTime);
     persist_write_string(FIRST_DRINK_KEY, firstDrinkStr);
     persist_write_string(LAST_DRINK_KEY, lastDrinkStr);
     // APP_LOG(APP_LOG_LEVEL_DEBUG, "countStatus: %d,\tstartStatus: %d", countStatus, startStatus);
@@ -199,9 +197,18 @@ static void setDrinkCountTextLayerText(int count)
 
 static void setDrinkPerStr(uint currentTime)
 {
-  float hours = (currentTime - startTime) / HOUR_CONVERT;
-  // APP_LOG(APP_LOG_LEVEL_DEBUG, "currentTime: %d\tstartTime: %d", currentTime, startTime);
-  float drinksPerHour = (float)drinkCount / (hours > 1 ? hours : 1.0);
+  float hours = (currentTime - startTime) / (float)HOUR_CONVERT;
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "currentTime: %d\tstartTime: %d", currentTime, startTime);
+  float drinksPerHour;
+  if(drinkCount == 1)
+  {
+    drinksPerHour = 1;
+  }
+  else
+  {
+    drinksPerHour = (float)drinkCount / hours;
+  }
+
   floatToString(drinksPerHourDisplayLayer->dynamicStr, BUFFER_LENGTH, drinksPerHour);
 }
 
