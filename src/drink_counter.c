@@ -220,7 +220,7 @@ static void drink_layer_load(Layer *parent)
   updateFirstDrinkTextLayerText();
 
   lastDrinkDisplayLater = display_layer_create(lowerLayerBounds, LAST);
-  setLastDrinkTextLayerText();
+  updateLastDrinkTextLayerText();
 
   layer_add_child(parent, drinkCountDisplayLayer->displayLayer);
   layer_add_child(parent, drinksPerHourDisplayLayer->displayLayer);
@@ -276,9 +276,7 @@ static void setDrinksPerHourTextLayerText()
 static void setFirstDrinkTextLayerText()
 {
   clock_copy_time_string(firstDrinkStr, BUFFER_LENGTH);
-  strcpy(firstDrinkDisplayLayer->dynamicStr, firstDrinkStr);
-  text_layer_set_text(firstDrinkDisplayLayer->dynamicTextLayer, firstDrinkDisplayLayer->dynamicStr);
-  layer_mark_dirty(text_layer_get_layer(firstDrinkDisplayLayer->dynamicTextLayer));
+  updateFirstDrinkTextLayerText();
 }
 
 static void updateFirstDrinkTextLayerText()
@@ -291,17 +289,13 @@ static void updateFirstDrinkTextLayerText()
 static void clearFirstDrinkTextLayerText()
 {
   memset(firstDrinkStr, 0, sizeof(firstDrinkStr));
-  strcpy(firstDrinkDisplayLayer->dynamicStr, firstDrinkStr);
-  text_layer_set_text(firstDrinkDisplayLayer->dynamicTextLayer, firstDrinkDisplayLayer->dynamicStr);
-  layer_mark_dirty(text_layer_get_layer(firstDrinkDisplayLayer->dynamicTextLayer));
+  updateFirstDrinkTextLayerText();
 }
 
 static void setLastDrinkTextLayerText()
 {
   clock_copy_time_string(lastDrinkStr, BUFFER_LENGTH);
-  strcpy(lastDrinkDisplayLater->dynamicStr, lastDrinkStr);
-  text_layer_set_text(lastDrinkDisplayLater->dynamicTextLayer, lastDrinkDisplayLater->dynamicStr);
-  layer_mark_dirty(text_layer_get_layer(lastDrinkDisplayLater->dynamicTextLayer));
+  updateLastDrinkTextLayerText();
 }
 
 static void updateLastDrinkTextLayerText()
@@ -314,9 +308,7 @@ static void updateLastDrinkTextLayerText()
 static void clearLastDrinkTextLayerText()
 {
   memset(lastDrinkStr, 0, sizeof(lastDrinkStr));
-  strcpy(lastDrinkDisplayLater->dynamicStr, lastDrinkStr);
-  text_layer_set_text(lastDrinkDisplayLater->dynamicTextLayer, lastDrinkDisplayLater->dynamicStr);
-  layer_mark_dirty(text_layer_get_layer(lastDrinkDisplayLater->dynamicTextLayer));
+  updateLastDrinkTextLayerText();
 }
 
 static void resetDrinkCount()
