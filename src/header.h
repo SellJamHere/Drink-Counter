@@ -1,6 +1,6 @@
 /************************************************************
- * AUTHOR 		: James Heller 
- * LICENSE 		: MIT
+ * AUTHOR       : James Heller 
+ * LICENSE      : MIT
  * DATE CREATED : 2013-12-21
  ************************************************************/
 
@@ -22,8 +22,8 @@
  *  DRINK_COUNT_DEFAULT  - Default value for drinkCount, 
  *                         if no value has been stored
  *
- *  LOWER_LAYER_COUNT	 - Number of lower layers that can
- *						   be displayed.
+ *  LOWER_LAYER_COUNT    - Number of lower layers that can
+ *                         be displayed.
  ************************************************************/
 #define BUFFER_LENGTH 16
 #define HOUR_CONVERT 3600
