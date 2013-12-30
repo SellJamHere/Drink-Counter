@@ -1,5 +1,6 @@
 #include "header.h"
 #include "display_layer.h"
+#include "menu.h"
 
 /********************************************************** 
 * 
@@ -21,6 +22,7 @@
 ***********************************************************/ 
 
 static Window *window;
+static MenuWindow *menuWindow;
 
 //Layout DisplayLayers
 static DisplayLayer *drinkCountDisplayLayer;
@@ -50,6 +52,7 @@ static void window_unload(Window *window);
 static void click_config_provider(void *context);
 static void up_single_click_handler(ClickRecognizerRef recognizer, void *context);
 static void up_double_click_handler(ClickRecognizerRef recognizer, void *context);
+static void select_single_click_handler(ClickRecognizerRef recognizer, void *context);
 static void select_double_click_handler(ClickRecognizerRef recognizer, void *context);
 static void down_click_handler(ClickRecognizerRef recognizer, void *context);
 
@@ -77,13 +80,14 @@ int main(void)
 
 static void init(void) 
 {
+  menuWindow = NULL;
+
   window = window_create();
   window_set_click_config_provider(window, click_config_provider);
   window_set_window_handlers(window, (WindowHandlers) {
     .load = window_load,
     .unload = window_unload,
   });
-  const bool animated = true;
 
   //initialize from persistant storage, if values exist
   drinkCount = persist_exists(DRINK_COUNT_KEY) ? persist_read_int(DRINK_COUNT_KEY) : DRINK_COUNT_DEFAULT;
@@ -101,7 +105,7 @@ static void init(void)
     
   }
   // APP_LOG(APP_LOG_LEVEL_DEBUG, "drinkCount: %d,\tstartTime: %d,\tfirstDrink: %s", drinkCount, startTime, firstDrinkStr);
-
+  const bool animated = true;
   window_stack_push(window, animated);
 }
 
@@ -126,6 +130,11 @@ static void deinit(void)
     free(lowerLayer);
   }
 
+  if(menuWindow != NULL)
+  {
+    menu_destroy(menuWindow);
+    free(menuWindow);
+  }
   window_destroy(window);
 }
 
@@ -154,6 +163,7 @@ static void click_config_provider(void *context)
 {
   window_multi_click_subscribe(BUTTON_ID_SELECT, 2, 0, 200, false, select_double_click_handler);
   window_single_click_subscribe(BUTTON_ID_UP, up_single_click_handler);
+  window_single_click_subscribe(BUTTON_ID_SELECT, select_single_click_handler);
   window_multi_click_subscribe(BUTTON_ID_UP, 2, 0, 200, false, up_double_click_handler);
   window_single_click_subscribe(BUTTON_ID_DOWN, down_click_handler);
 }
@@ -183,6 +193,15 @@ static void up_double_click_handler(ClickRecognizerRef recognizer, void *context
     setDrinkCountTextLayerText(drinkCount);
     setDrinksPerHourTextLayerText();
   }
+}
+
+static void select_single_click_handler(ClickRecognizerRef recognizer, void *context)
+{
+  if(menuWindow == NULL)
+  {
+    menuWindow = menu_create();
+  }
+  window_stack_push(menuWindow->window, true);
 }
 
 static void select_double_click_handler(ClickRecognizerRef recognizer, void *context) 
