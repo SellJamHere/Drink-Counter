@@ -5,13 +5,15 @@ static void window_unload(Window *window);
 
 MenuWindow* menu_create()
 {
+    MenuWindow *menu = malloc(sizeof(MenuWindow));
+
     Window *window = window_create();
     window_set_window_handlers(window, (WindowHandlers) {
         .load = window_load,
         .unload = window_unload
     });
 
-    menu->window = malloc(sizeof *menu);
+    menu->window = window;
 
     return menu;
 }

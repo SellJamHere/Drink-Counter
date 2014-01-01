@@ -5,7 +5,7 @@ static void display_layer_set(DisplayLayer* displayLayer);
 
 DisplayLayer* display_layer_create(GRect frame, const char *staticStr)
 {
-	DisplayLayer *displayLayer = malloc(sizeof *displayLayer);
+	DisplayLayer *displayLayer = malloc(sizeof(DisplayLayer));
 
 	displayLayer->staticStr = staticStr;
 	displayLayer->displayLayer = layer_create(frame);

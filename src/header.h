@@ -21,6 +21,8 @@
  *
  *  DRINK_COUNT_DEFAULT  - Default value for drinkCount, 
  *                         if no value has been stored
+ *  START_TIME_DEFAULT   - Default value for startTime,
+                           if no value has been stored
  *
  *  LOWER_LAYER_COUNT    - Number of lower layers that can
  *                         be displayed.
@@ -35,6 +37,7 @@
 #define LAST_DRINK_KEY 3
 //Persistance defaults
 #define DRINK_COUNT_DEFAULT 0
+#define START_TIME_DEFAULT 0
 //Number of DisplayLayers
 #define LOWER_LAYER_COUNT 3
 
