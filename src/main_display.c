@@ -3,10 +3,10 @@
 /************************************************************
  *  Constant c-strings used as headers in the display
  ************************************************************/
-static const char *DRINK_NUM = "Drink #:";
-static const char *DRINK_PER = "Drink/hr:";
-static const char *FIRST = "First:";
-static const char *LAST = "Last:";
+static const char *DRINK_NUM_STATIC_STR = "Drink #:";
+static const char *DRINK_PER_STATIC_STR = "Drink/hr:";
+static const char *FIRST_DRINK_STATIC_STR = "First:";
+static const char *LAST_DRINK_STATIC_STR = "Last:";
 
 typedef enum {DRINKS_PER_HOUR, FIRST_DRINK, LAST_DRINK} LowerLayerType;
 
@@ -46,20 +46,8 @@ MainDisplay *main_display_create()
 
 void main_display_destroy(MainDisplay *mainDisplay)
 {
-    free(mainDisplay->drinkCountDisplayLayer);
-
-    for (int i = 0; i < LOWER_LAYER_COUNT; i++)
-    {
-        DisplayLayer *lowerLayer = mainDisplay->lowerLayers[i];
-        free(lowerLayer);
-    }
-
-    // if(menuWindow != NULL)
-    // {
-    //     menu_destroy(menuWindow);
-    //     free(menuWindow);
-    // }
     window_destroy(mainDisplay->window);
+    free(mainDisplay);
 }
 
 void main_display_window_init(MainDisplay *mainDisplay)
@@ -71,8 +59,6 @@ void main_display_window_init(MainDisplay *mainDisplay)
         .load = window_load,
         .unload = window_unload,
     });
-
-    // APP_LOG(APP_LOG_LEVEL_DEBUG, "drinkCount: %d,\tstartTime: %d,\tfirstDrink: %s", drinkCount, startTime, firstDrinkStr);
     window_stack_push(window, true);
 }
 
@@ -87,15 +73,15 @@ static void window_load(Window *window)
 
 }
 
-
-
 static void window_unload(Window *window) 
 {
-    // MainDisplay *mainDisplay = (MainDisplay*)window_get_user_data(window);
-    // display_layer_destroy(mainDisplay->drinkCountDisplayLayer);
-    // display_layer_destroy(mainDisplay->drinksPerHourDisplayLayer);
-    // display_layer_destroy(mainDisplay->firstDrinkDisplayLayer);
-    // display_layer_destroy(mainDisplay->lastDrinkDisplayLater);
+    MainDisplay *mainDisplay = (MainDisplay*)window_get_user_data(window);
+    display_layer_destroy(mainDisplay->drinkCountDisplayLayer);
+    for (int i = 0; i < LOWER_LAYER_COUNT; i++)
+    {
+        DisplayLayer *lowerLayer = mainDisplay->lowerLayers[i];
+        display_layer_destroy(lowerLayer);
+    }
 }
 
 
@@ -182,17 +168,17 @@ static void drink_layer_load(Layer *parent, MainDisplay *mainDisplay)
     DrinkCounter *drinkCounter = drink_counter_get();
     GRect parentBounds = layer_get_bounds(parent);
 
-    mainDisplay->drinkCountDisplayLayer = display_layer_create(parentBounds, DRINK_NUM);
+    mainDisplay->drinkCountDisplayLayer = display_layer_create(parentBounds, DRINK_NUM_STATIC_STR);
     setDrinkCountTextLayerText(mainDisplay, drinkCounter->drinkCount);
 
     GRect lowerLayerBounds = GRect(0, 1 + (parentBounds.size.h/2), parentBounds.size.w, parentBounds.size.h/2 - 1);
-    mainDisplay->lowerLayers[DRINKS_PER_HOUR] = display_layer_create(lowerLayerBounds, DRINK_PER);
+    mainDisplay->lowerLayers[DRINKS_PER_HOUR] = display_layer_create(lowerLayerBounds, DRINK_PER_STATIC_STR);
     setDrinksPerHourTextLayerText(mainDisplay);
 
-    mainDisplay->lowerLayers[FIRST_DRINK] = display_layer_create(lowerLayerBounds, FIRST);
+    mainDisplay->lowerLayers[FIRST_DRINK] = display_layer_create(lowerLayerBounds, FIRST_DRINK_STATIC_STR);
     updateFirstDrinkTextLayerText(mainDisplay);
 
-    mainDisplay->lowerLayers[LAST_DRINK] = display_layer_create(lowerLayerBounds, LAST);
+    mainDisplay->lowerLayers[LAST_DRINK] = display_layer_create(lowerLayerBounds, LAST_DRINK_STATIC_STR);
     updateLastDrinkTextLayerText(mainDisplay);
 
     layer_add_child(parent, mainDisplay->drinkCountDisplayLayer->displayLayer);
@@ -226,7 +212,6 @@ static void setDrinkPerStr(MainDisplay *mainDisplay, uint currentTime)
 {
     DrinkCounter *drinkCounter = drink_counter_get();
     float hours = (currentTime - drinkCounter->startTime) / (float)HOUR_CONVERT;
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "currentTime: %d\tstartTime: %d", currentTime, drinkCounter->startTime);
     float drinksPerHour;
     if(drinkCounter->drinkCount == 1)
     {

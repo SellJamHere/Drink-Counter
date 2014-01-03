@@ -15,6 +15,7 @@ void drink_counter_create()
 void drink_counter_destroy()
 {
     free(drinkCounter);
+    drinkCounter = NULL;
 }
 
 void drink_counter_persist_load()
@@ -39,21 +40,15 @@ void drink_counter_persist_write()
     if(drinkCounter->drinkCount != 0)
     {
         //save to persistant storage
-        // APP_LOG(APP_LOG_LEVEL_DEBUG, "drinkCount: %d,\tstartTime: %d", drinkCount, startTime);
         persist_write_int(DRINK_COUNT_KEY, drinkCounter->drinkCount);
         persist_write_int(START_TIME_KEY, drinkCounter->startTime);
         persist_write_string(FIRST_DRINK_KEY, drinkCounter->firstDrinkStr);
         persist_write_string(LAST_DRINK_KEY, drinkCounter->lastDrinkStr);
-        // APP_LOG(APP_LOG_LEVEL_DEBUG, "countStatus: %d,\tstartStatus: %d", countStatus, startStatus);
     }
 }
 
 DrinkCounter* drink_counter_get()
 {
-    if(drinkCounter == NULL)
-    {
-        drink_counter_create();
-    }
     return drinkCounter;
 }
 
@@ -61,6 +56,8 @@ void drink_counter_reset()
 {
     drinkCounter->drinkCount = 0;
     drinkCounter->startTime = (uint)time(NULL);
+    memset(drinkCounter->firstDrinkStr, 0, sizeof(drinkCounter->firstDrinkStr));
+    memset(drinkCounter->lastDrinkStr, 0, sizeof(drinkCounter->lastDrinkStr));
 
     persist_delete(DRINK_COUNT_KEY);
     persist_delete(START_TIME_KEY);

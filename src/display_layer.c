@@ -37,4 +37,6 @@ void display_layer_destroy(DisplayLayer *displayLayer)
 	text_layer_destroy(displayLayer->dynamicTextLayer);
 
 	layer_destroy(displayLayer->displayLayer);
+
+	free(displayLayer);
 }

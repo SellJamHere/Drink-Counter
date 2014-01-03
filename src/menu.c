@@ -31,4 +31,5 @@ static void window_unload(Window *window)
 void menu_destroy(MenuWindow *menu)
 {
     window_destroy(menu->window);
+    free(menu);
 }

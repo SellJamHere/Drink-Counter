@@ -44,6 +44,7 @@ static void init(void)
 
 static void deinit(void) 
 {
+    drink_counter_persist_write();
     drink_counter_destroy();
     main_display_destroy(mainDisplay);
 }
